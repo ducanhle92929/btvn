@@ -1,99 +1,217 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 
-const TextInputExample = ({ navigation }) => { // Đảm bảo navigation được truyền vào
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+export default function LoginScreen({ navigation }) {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({ email: '', password: '' });
 
-  const handleCheck = () => {
-    if (!name) {
-      Alert.alert('Thông báo', 'Vui lòng nhập họ tên!');
-      return;
+  const handleSignIn = () => {
+    let valid = true;
+    let newErrors = { email: '', password: '' };
+
+    if (!email) {
+      newErrors.email = 'Email là bắt buộc.';
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email không hợp lệ.';
+      valid = false;
     }
-    if (!phone) {
-      Alert.alert('Thông báo', 'Vui lòng nhập số điện thoại!');
-      return;
-    }
+
     if (!password) {
-      Alert.alert('Thông báo', 'Vui lòng nhập mật khẩu!');
-      return;
+      newErrors.password = 'Mật khẩu là bắt buộc.';
+      valid = false;
+    } else if (password.length < 6) {
+      newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự.';
+      valid = false;
     }
 
-    Alert.alert('Thành công', 'Chuyển sang màn hình tiếp theo!');
-    // navigation.navigate('NextScreen'); // Điều hướng sang màn hình tiếp theo
+    setErrors(newErrors);
+
+    if (valid) {
+      // Điều hướng đến màn hình tiếp theo hoặc xử lý đăng nhập
+      alert('Đăng nhập thành công!');
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Đăng Kí</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập họ tên"
-        value={name}
-        onChangeText={setName}
+      <Image
+        source={require('@/assets/images/name.png')}
+        style={styles.logo}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập số điện thoại"
-        keyboardType="phone-pad"
-        value={phone}
-        onChangeText={setPhone}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Nhập mật khẩu"
-        secureTextEntry={true}
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleCheck}>
-        <Text style={styles.buttonText}>Login</Text>
+      <Text style={styles.title}>Welcome to Lungo !!</Text>
+      <Text style={styles.subtitle}>Login to Continue</Text>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email Address"
+          placeholderTextColor="#666"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#666"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Image
+            source={showPassword ? require('@/assets/images/eye.png') : require('@/assets/images/hide.png')}
+            style={styles.icon}
+          />
+        </TouchableOpacity>
+        {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
+      </View>
+
+      <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
+      {/* style={styles.registerButton}
+      onPress={() => navigation.navigate('index')} */}
+        <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.googleButton}>
+        <Image
+          source={require('@/assets/images/google.png')}
+          style={styles.googleIcon}
+        />
+        <Text style={styles.googleText}>Sign in with Google</Text>
+      </TouchableOpacity>
+
+      <View style={styles.bottomLinks}>
+        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.link}>
+            Don't have account? Click <Text style={styles.highlight}>Register</Text>
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.link}>
+            Forget Password? Click <Text style={styles.highlight}>Reset</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#0C0F14',
+    padding: 20,
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
+    color: '#FFFFFF',
     fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 40,
+  },
+  inputContainer: {
+    width: '100%',
     marginBottom: 20,
-    color: '#000',
+    position: 'relative',
   },
   input: {
-    width: '80%',
+    width: '100%',
     height: 50,
-    borderColor: '#aaa',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 16,
-    paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#2C2C2C',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    color: '#FFFFFF',
   },
-  button: {
-    width: '50%',
+  eyeIcon: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    tintColor: '#666',
+  },
+  errorText: {
+    color: '#FF6B6B',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 5,
+  },
+  signInButton: {
+    width: '100%',
     height: 50,
+    backgroundColor: '#D17842',
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    borderColor: '#aaa',
-    borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: '#FFC300',
-    marginTop: 20,
+    marginBottom: 20,
   },
-  buttonText: {
-    color: '#fff',
+  signInText: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
+  googleButton: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 30,
+  },
+  googleIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  googleText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  bottomLinks: {
+    width: '100%',
+    alignItems: 'center',
+    gap: 10,
+  },
+  link: {
+    color: '#666',
+    fontSize: 14,
+  },
+  highlight: {
+    color: '#D17842',
+  },
 });
-
-export default TextInputExample;
